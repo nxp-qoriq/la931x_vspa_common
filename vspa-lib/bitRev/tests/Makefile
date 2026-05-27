@@ -11,7 +11,7 @@ KERNEL_DIR    = ..
 VSPA_SDK_INC  = ../../../vspa-sdk/inc
 REPO_ROOT     = ../../../../..
 FRAMEWORK_DIR = $(REPO_ROOT)/framework
-BUILD_DIR     = $(REPO_ROOT)/build/tests
+BUILD_DIR    ?= ../build/tests
 
 VCFLAGS = \
     -arch vspa2 \

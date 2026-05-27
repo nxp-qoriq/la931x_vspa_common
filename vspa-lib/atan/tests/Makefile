@@ -13,7 +13,7 @@ KERNEL_DIR    = ..
 VSPA_SDK_INC  = ../../../vspa-sdk/inc
 REPO_ROOT     = ../../../../..
 FRAMEWORK_DIR = $(REPO_ROOT)/framework
-BUILD_DIR     = $(REPO_ROOT)/build/tests
+BUILD_DIR    ?= ../build/tests
 
 TC_VECTOR_DIR = vectors/$(TC)
 TC_PARAMS     = $(TC_VECTOR_DIR)/tc_params.h

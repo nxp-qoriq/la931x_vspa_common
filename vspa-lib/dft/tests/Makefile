@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# cycShiftFD kernel smoke-test build system (submodule-local layout)
+# dft kernel end-to-end test build system (submodule-local layout)
 
 VSPA_TOOL         ?= /environment/cwvspa.vbeta_14_00_781_vspa.linux/VSPA_Tools
 VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
@@ -27,12 +27,11 @@ VCFLAGS = \
     -isystem $(VSPA_TOOL)/include \
     -I$(VSPA_SDK_INC) \
     -I$(KERNEL_DIR)/include \
-    -I$(FRAMEWORK_DIR) \
-    -D__VSPA_H__ -DUPHW=1 -DSIZEMAU=1
+    -I$(FRAMEWORK_DIR)
 
-TARGET = $(BUILD_DIR)/test_cycShiftFD_vspa2_$(AU)au.elf
+TARGET = $(BUILD_DIR)/test_dft_vspa2_$(AU)au.elf
 
-SRCS = test_cycShiftFD.c $(KERNEL_DIR)/src/cycShiftFD.sx
+SRCS = test_dft.c $(KERNEL_DIR)/src/mini_dft_hfx_hfl_asm.sx
 
 .PHONY: all generate test clean
 
@@ -59,4 +58,4 @@ test: $(TARGET)
 	python3 $(REPO_ROOT)/scripts/run_test.py $(TARGET) vspa2_$(AU)au
 
 clean:
-	rm -f vectors/input.hex vectors/ref.hex $(TARGET)
+	rm -f $(BUILD_DIR)/test_dft_*.elf
