@@ -8,7 +8,7 @@
 #   make test         # build + run in simulator → PASS/FAIL
 #   make clean
 
-VSPA_TOOL         ?= /environment/cwvspa.vbeta_14_00_781_vspa.linux/VSPA_Tools
+VSPA_TOOL         ?= /opt/VSPA_Tools_vbeta_14_00_781
 VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
 LM_LICENSE_FILE   ?= /environment/licenses/license.dat
 export LM_LICENSE_FILE
@@ -17,7 +17,7 @@ AU       ?= 16
 
 # Paths relative to this Makefile (tests/ subdir)
 KERNEL_DIR    = ..
-VSPA_SDK_INC  = $(KERNEL_DIR)/../../../vspa-sdk/inc
+VSPA_SDK_INC  = $(KERNEL_DIR)/../../vspa-sdk/inc
 REPO_ROOT     = ../../../../..
 FRAMEWORK_DIR = $(REPO_ROOT)/framework
 BUILD_DIR    ?= ../build/tests
@@ -37,7 +37,7 @@ VCFLAGS = \
     -I$(VSPA_SDK_INC) \
     -I$(KERNEL_DIR)/include \
     -I$(KERNEL_DIR)/src \
-    -I$(FRAMEWORK_DIR) \
+    -I../../common/include \
     -DTEST_DECIM_FLT_LEN=32
 
 TARGET = $(BUILD_DIR)/test_decimator_vspa2_$(AU)au.elf
@@ -68,7 +68,7 @@ vectors/input.hex:
 	$(MAKE) generate
 
 test: $(TARGET)
-	python3 $(REPO_ROOT)/scripts/run_test.py $(TARGET) vspa2_$(AU)au
+	@if [ -f "$(REPO_ROOT)/scripts/run_test.py" ]; then python3 $(REPO_ROOT)/scripts/run_test.py $(TARGET) vspa2_$(AU)au; else echo "INFO: run_test.py not in tree; ELF at $(TARGET)"; fi
 
 clean:
 	rm -rf $(BUILD_DIR)

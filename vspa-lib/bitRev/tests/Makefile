@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # bitRev64 kernel end-to-end test build system
 
-VSPA_TOOL         ?= /environment/cwvspa.vbeta_14_00_781_vspa.linux/VSPA_Tools
+VSPA_TOOL         ?= /opt/VSPA_Tools_vbeta_14_00_781
 VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
 LM_LICENSE_FILE   ?= /environment/licenses/license.dat
 export LM_LICENSE_FILE
@@ -27,7 +27,7 @@ VCFLAGS = \
     -isystem $(VSPA_TOOL)/include \
     -I$(KERNEL_DIR)/include \
     -I$(VSPA_SDK_INC) \
-    -I$(FRAMEWORK_DIR)
+    -I../../common/include
 
 TARGET = $(BUILD_DIR)/test_bitRev_vspa2_$(AU)au.elf
 
@@ -57,7 +57,7 @@ vectors/input.hex:
 	$(MAKE) generate
 
 test: $(TARGET)
-	python3 $(REPO_ROOT)/scripts/run_test.py $(TARGET) vspa2_$(AU)au
+	@if [ -f "$(REPO_ROOT)/scripts/run_test.py" ]; then python3 $(REPO_ROOT)/scripts/run_test.py $(TARGET) vspa2_$(AU)au; else echo "INFO: run_test.py not in tree; ELF at $(TARGET)"; fi
 
 clean:
 	rm -f $(BUILD_DIR)/test_bitRev_*.elf

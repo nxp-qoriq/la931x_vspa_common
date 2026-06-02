@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # compression16_12b kernel end-to-end test build system (submodule-local layout)
 
-VSPA_TOOL         ?= /environment/cwvspa.vbeta_14_00_781_vspa.linux/VSPA_Tools
+VSPA_TOOL         ?= /opt/VSPA_Tools_vbeta_14_00_781
 VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
 LM_LICENSE_FILE   ?= /environment/licenses/license.dat
 export LM_LICENSE_FILE
