@@ -61,7 +61,7 @@ doc:
 depends_on: []
 
 perf:
-  cycles: 4216
+  cycles: 54
   au_config: vspa2_16au
   notes: "Factor=2 decimation with half_fixed I/O; re-measured runsim 2026-05-27"
 ---

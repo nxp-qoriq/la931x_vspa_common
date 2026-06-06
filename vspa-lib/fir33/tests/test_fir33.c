@@ -104,11 +104,15 @@ int main(void)
         x_buffer[IN_OFFSET + i] = INPUT_DATA[i];
 
     // Run NXP half-fixed FIR kernel (cwproj-equivalent call).
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     firFilterReal((cfixed16_t *)(x_buffer + IN_OFFSET),
                   (cfixed16_t *)y_buffer,
                   (fixed16_t *)taps_buffer,
                   IT_DAT,
                   IT_TAPS);
+    KCYC_STOP_PRINT();
 
     // Bit-exact comparison — prints PASS / FAIL line for run_test.py.
     return vspa_array_cmp(y_buffer, y_ref, M);

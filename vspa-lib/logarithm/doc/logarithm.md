@@ -29,7 +29,7 @@ doc:
 depends_on: []
 
 perf:
-  cycles: 4203
+  cycles: 1056
   au_config: vspa2_16au
   notes: "log_asm PASS (N=32, log(0.5)); re-measured runsim 2026-05-27"
 ---

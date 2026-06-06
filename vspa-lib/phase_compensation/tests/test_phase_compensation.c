@@ -64,7 +64,11 @@ int main(void)
     COEFF_BUFF[0] = COEFF_DATA[0];
     COEFF_BUFF[1] = COEFF_DATA[1];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     phcom_asm((void *)OUT_BUFF, (void *)INP_BUFF, (void *)COEFF_BUFF, LINES);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)OUT_BUFF,
                           (const unsigned *)REF_DATA,

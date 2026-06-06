@@ -24,6 +24,39 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+// ---------------------------------------------------------------------------
+// Kernel cycle measurement (KCYC_*) - self-contained copy for harnesses that
+// do not include common/include/test_utils.h. Measures the kernel body only
+// (honest cycle count), not the whole-program runsim total.
+// ---------------------------------------------------------------------------
+#include <time.h>
+static clock_t _kcyc_start, _kcyc_end, _kcyc_overhead;
+__attribute__((unused, optimize("O0")))
+static void _kcyc_pipe_flush(void)
+{
+    __asm("fnop;");
+    __asm("fnop;");
+    __asm("fnop;");
+}
+#define KCYC_INIT()                                               \
+    do {                                                          \
+        _kcyc_start    = clock();                                 \
+        _kcyc_end      = clock();                                 \
+        _kcyc_overhead = _kcyc_end - _kcyc_start;                 \
+    } while (0)
+#define KCYC_START()                                              \
+    do {                                                          \
+        _kcyc_pipe_flush();                                       \
+        _kcyc_start = clock();                                    \
+    } while (0)
+#define KCYC_STOP_PRINT()                                         \
+    do {                                                          \
+        _kcyc_end = clock();                                      \
+        _kcyc_pipe_flush();                                       \
+        printf("KERNEL_CYCLES: %ld\n",                           \
+               (long)(_kcyc_end - _kcyc_start - _kcyc_overhead)); \
+    } while (0)
 #include <vspa/intrinsics.h>
 
 #define main vcpu_sdk_main
@@ -82,6 +115,9 @@ int main(void)
     ippu_args[0] = (uint32_t)((void *)out);
     ippu_args[1] = (uint32_t)((void *)input);
     ippu_arg_base(IPPU_OFFSET((uint32_t)ippu_args));
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     ippu_enable((ippu_proc_t)bitRev64, IPPU_PEND_NONE | IPPU_MODE_16BIT);
 
     __asm volatile("fnop .asmvol");
@@ -90,6 +126,7 @@ int main(void)
 
     while (!ippu_is_done()) {
     }
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp_u32(out, ref, N);
 }

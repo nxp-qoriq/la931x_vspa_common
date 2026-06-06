@@ -86,7 +86,8 @@ def main() -> int:
 
     _PC_RE = re.compile(r"^PC:\s*\d+")
     program_lines: list[str] = []
-    total_cycles: int | None = None
+    total_cycles: int | None = None   # whole-program (showpc CYC: trace)
+    kernel_cycles: int | None = None  # kernel body (KERNEL_CYCLES: printf)
 
     for line in result.stdout.splitlines():
         if _PC_RE.match(line):
@@ -97,6 +98,14 @@ def main() -> int:
             stripped = line.strip()
             if stripped:
                 program_lines.append(stripped)
+                km = re.search(r'KERNEL_CYCLES:\s*(-?\d+)', stripped)
+                if km:
+                    kernel_cycles = int(km.group(1))
+
+    # Prefer the honest kernel-body count (KCYC_* macros) over the
+    # whole-program total. The kernel count is available without -showpc.
+    cycles = kernel_cycles if kernel_cycles is not None else total_cycles
+
 
     passed: bool | None = None
     for line in program_lines:
@@ -109,9 +118,10 @@ def main() -> int:
 
     print("=" * 60)
     if passed is True:
-        cycle_str = f"  ({total_cycles} cycles)" if total_cycles is not None else ""
+        cycle_str = f"  ({cycles} cycles)" if cycles is not None else ""
         print(f"RESULT : PASS ✓{cycle_str}")
         return 0
+
     if passed is False:
         print("RESULT : FAIL ✗")
         for line in program_lines:

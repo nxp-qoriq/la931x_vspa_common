@@ -61,10 +61,14 @@ int main(void)
         LOG_OUT_BUFF[i] = 0.0f;
     }
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     // Scalar log loop, mirroring cwproj/src/main.c.
     for (i = 0; i < N; i++) {
         LOG_OUT_BUFF[i] = log_asm(LOG_INP_BUFF[i], LOG_FACT);
     }
+    KCYC_STOP_PRINT();
 
     // Bit-exact compare via uint32 reinterpretation.
     return vspa_array_cmp((const unsigned *)LOG_OUT_BUFF,

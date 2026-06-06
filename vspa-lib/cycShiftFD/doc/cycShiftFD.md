@@ -39,7 +39,7 @@ doc:
 depends_on: []
 
 perf:
-  cycles: 4131
+  cycles: 46
   au_config: vspa2_16au
   notes: "cycShiftFD_asm PASS (shift=0, L=2); re-measured runsim 2026-05-27 (median of 3)"
 ---

@@ -68,11 +68,15 @@ int main(void)
     // STATE_BUFF and OUT_BUFF stay BSS-zero. Asm reads zero filter history
     // from STATE_BUFF; this matches inp_hist=zeros(FLT_LEN-1) in Python.
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     decimator_2x_8_Taps_asm((void *)OUT_BUFF,
                             (void *)INP_BUFF,
                             (float *)TAPS_BUFF,
                             (void *)STATE_BUFF,
                             (unsigned)N_IN);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)OUT_BUFF,
                           (const unsigned *)REF_DATA,

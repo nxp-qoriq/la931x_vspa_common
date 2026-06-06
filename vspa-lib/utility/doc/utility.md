@@ -19,7 +19,7 @@ depends_on: []
 test_cases: []
 perf:
   target_efficiency: null
-  cycles: 4634
+  cycles: 2880
   c_cycles: null
   sx_cycles: null
   au_config: vspa2_16au

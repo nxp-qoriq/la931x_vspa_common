@@ -100,6 +100,9 @@ int main(void)
     // `mat_bmult_d1x1xd3_chfx_csp_chfl_asm` path. Wrapper returns
     // MAT_BMULT_SUCCESS (=0) on valid params; nonzero indicates a config
     // bug — let it propagate via vspa_array_cmp's mismatch path instead.
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     MAT_BMULT_RETURN_T err = mat_bmult_chfx_csp_chfl_c(
         (void *)VEC_BUFF,
         (void *)MAT_BUFF,
@@ -107,6 +110,7 @@ int main(void)
         (uint32_t)DIM1_RUN,
         (uint32_t)DIM2_RUN,
         (uint32_t)DIM3_RUN);
+    KCYC_STOP_PRINT();
 
     if (err != MAT_BMULT_SUCCESS) {
         printf("mat_bmult returned ERROR (%d)\n", (int)err);

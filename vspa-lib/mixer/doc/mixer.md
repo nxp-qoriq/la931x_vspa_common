@@ -54,7 +54,7 @@ test_cases:
 
 perf:
   target_efficiency: null
-  cycles: 4303
+  cycles: 27
   au_config: vspa2_16au
   notes: "mixer_asm PASS with zero-input smoke harness (L=2). Full functional coverage with NCO/complex tone vectors needed.; re-measured runsim 2026-05-27 (median of 3)"
 ---

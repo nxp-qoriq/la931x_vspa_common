@@ -104,7 +104,11 @@ int main(void)
     for (i = 0; i < N_INPUT_WORDS; i++)
         bitIn[i] = INPUT_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     QAM_MOD_FN(bitIn, (void *)qamOut, (unsigned int)N_LINES);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp(qamOut, REF_DATA, N_OUT_SYMBOLS);
 }

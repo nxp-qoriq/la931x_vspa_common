@@ -31,7 +31,7 @@ doc:            []
 depends_on: []
 
 perf:
-  cycles: 5457
+  cycles: 27
   au_config: vspa2_16au
   notes: "pow_acc_asm; assembly-only implementation; re-measured runsim 2026-05-27"
 ---

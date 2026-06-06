@@ -59,9 +59,13 @@ int main(void)
     for (i = 0; i < N_HW; i++)
         MIXER_INP_BUFF[i] = INPUT_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     (void)mixer_asm((cfixed16_t *)MIXER_OUT_BUFF,
                     (cfixed16_t *)MIXER_INP_BUFF,
                     PHASE_IN, FREQ_IN, LINES);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)MIXER_OUT_BUFF,
                           (const unsigned *)REF_DATA,

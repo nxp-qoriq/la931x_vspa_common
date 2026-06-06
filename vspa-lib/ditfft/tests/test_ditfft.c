@@ -70,8 +70,12 @@ int main(void)
         INP_BUFF[INPUT_OFFSET + i] = INPUT_DATA[i];
 
     // 512-point DIT FFT: float16 in, half_fixed (SM16) out.
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     fftDIT512_hfl((vspa_complex_float16 const *)(INP_BUFF + INPUT_OFFSET),
                   (vspa_complex_fixed16 *)OUT_BUFF);
+    KCYC_STOP_PRINT();
 
     // Bit-exact uint32 comparison.  vspa_array_cmp prints the first mismatch
     // and a final "PASS"/"FAIL" line that scripts/run_test.py parses.

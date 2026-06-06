@@ -79,8 +79,13 @@ int main(void)
     for (i = 0; i < TC_N_REF_WORDS; i++)
         out_words[i] = 0;
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
+
     // Dispatch to correct kernel variant (selected at compile time)
 #if   (TC_INP_PREC == 0 && TC_OUT_PREC == 0)
+
     atan2_x64_chf_hf_asm((cfixed16_t *)inp_words, (fixed16_t  *)out_words, ATAN_COUNT);
 #elif (TC_INP_PREC == 0 && TC_OUT_PREC == 2)
     atan2_x64_chf_sp_asm((cfixed16_t *)inp_words, (float32_t  *)out_words, ATAN_COUNT);
@@ -96,5 +101,8 @@ int main(void)
     atan2_x64_csp_sp_asm((cfloat32_t *)inp_words, (float32_t  *)out_words, ATAN_COUNT);
 #endif
 
+    KCYC_STOP_PRINT();
+
     return vspa_array_cmp(out_words, ref_words, TC_N_REF_WORDS);
+
 }

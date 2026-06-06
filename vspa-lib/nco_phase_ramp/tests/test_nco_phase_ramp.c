@@ -61,11 +61,15 @@ int main(void)
     for (i = 0; i < N_HW_GAIN; i++)
         GAIN_BUFF[i] = GAIN_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     phase_ramp_gen((void *)PHASE_RAMP_OUT_BUFF,
                    (void *)GAIN_BUFF,
                    PHASE_RAMP,
                    PHASE_INIT,
                    (uint32_t)NUM_LINES);
+    KCYC_STOP_PRINT();
 
     // Compare as packed uint32 words (re_u16 | im_u16<<16).
     return vspa_array_cmp((const unsigned *)PHASE_RAMP_OUT_BUFF,

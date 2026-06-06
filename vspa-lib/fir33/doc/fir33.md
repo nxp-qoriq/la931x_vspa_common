@@ -64,7 +64,7 @@ test_cases:
 
 perf:
   target_efficiency: null
-  cycles: 60714
+  cycles: 2135
   au_config: vspa2_16au
   notes: "TC000 (M=64, L=33); 100% bit-exact; half_fixed complex input, real taps; re-measured runsim 2026-05-27 (median of 3)"
 ---

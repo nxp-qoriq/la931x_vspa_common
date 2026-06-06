@@ -77,11 +77,15 @@ int main(void)
     for (i = 0; i < 3; i++)
         alpha_buf[i] = ALPHA_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     rhf_rhf_rhf_vAddSclr_asm(
         (int16_t *)y_buf,
         (int16_t *)x_buf,
         (int16_t *)&alpha_buf[1],   // cwproj passes &alpha[1]
         (size_t)L);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp_u16(y_buf, REF_DATA, DATA_N);
 }

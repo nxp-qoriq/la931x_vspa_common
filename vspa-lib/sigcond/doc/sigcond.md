@@ -57,7 +57,7 @@ doc:
 depends_on: []
 
 perf:
-  cycles: 115279
+  cycles: 598
   au_config: vspa2_16au
   notes: "160→20 Msps (8x decimation) configuration; re-measured runsim 2026-05-27"
 ---

@@ -42,7 +42,7 @@ test_cases:
 
 perf:
   target_efficiency: null
-  cycles: 3437
+  cycles: 103
   au_config: vspa2_16au
   notes: "bitRev64Invoke PASS using MATLAB r_bitRev64 behavior (bitrevorder permutation + [33:64; 1:32] shift); IPPU microcode runs end-to-end in runsim.exe — canonical IPPU-in-cosim example; re-measured runsim 2026-05-27 (median of 3)"
 ---

@@ -24,7 +24,7 @@ doc:            []
 depends_on: []
 
 perf:
-  cycles: 72925
+  cycles: 381
   au_config: vspa2_16au
   notes: ""
 ---

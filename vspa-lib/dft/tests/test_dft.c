@@ -42,7 +42,11 @@ int main(void)
     for (i = 0; i < N; i++)
         INP_BUFF[i] = INPUT_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     mini_dft_hfx_hfl_asm((void *)INP_BUFF, (void *)OUT_BUFF, N);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp(OUT_BUFF, REF_DATA, N);
 }

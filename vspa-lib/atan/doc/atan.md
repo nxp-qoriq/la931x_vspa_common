@@ -53,7 +53,7 @@ depends_on: []
 
 perf:
   target_efficiency: null
-  cycles: 2665
+  cycles: 69
   au_config: vspa2_16au
   notes: "TC001, default config, vspa2_16au; 56 NXP test cases bit-exact; re-measured runsim 2026-05-27 (median of 3)"
 ---

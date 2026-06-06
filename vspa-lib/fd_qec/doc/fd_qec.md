@@ -29,7 +29,7 @@ doc:
 depends_on: []
 
 perf:
-  cycles: 12429
+  cycles: 56
   au_config: vspa2_16au
   notes: "fd_qec PASS (N=32, zero-input); re-measured runsim 2026-05-27"
 ---

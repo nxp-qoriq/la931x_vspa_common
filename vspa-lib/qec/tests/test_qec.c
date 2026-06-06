@@ -79,10 +79,14 @@ int main(void)
     // QEC_PARAMS is BSS-zero already; gen_vectors guarantees the matching
     // reference was computed under the all-zero parameter config.
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     qec_opt_asm((void *)QEC_OUT_BUFF,
                 (void *)QEC_INP_BUFF,
                 (unsigned int)N_SAMPLES,
                 (void *)QEC_PARAMS);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)QEC_OUT_BUFF,
                           (const unsigned *)REF_DATA,

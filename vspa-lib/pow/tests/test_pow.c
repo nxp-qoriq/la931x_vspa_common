@@ -55,7 +55,11 @@ int main(void)
     for (i = 0; i < ACC_SLOTS; i++)
         POW_ACC[i] = 0;
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     pow_acc_asm((void *)POW_INP_BUFF, (void *)POW_ACC, (unsigned)N_LINES);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)POW_ACC,
                           (const unsigned *)REF_DATA,

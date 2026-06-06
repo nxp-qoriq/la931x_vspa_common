@@ -68,11 +68,15 @@ int main(void)
 
     // history stays BSS-zeroed; the Python oracle was called with
     // inp_hist=None (== zeros), so the asm and oracle see matching state.
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     fir_filter((__fx16 *)fir64_output,
                (__fx16 *)fir64_input,
                NUM_INPUT_SAMPLES,
                (__fx16 *)fir64_history,
                fir64_taps);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)fir64_output,
                           (const unsigned *)REF_DATA,

@@ -24,7 +24,7 @@ doc:            []
 depends_on: []
 
 perf:
-  cycles: 6609
+  cycles: 31
   au_config: vspa2_16au
   notes: "re-measured runsim 2026-05-27"
 ---

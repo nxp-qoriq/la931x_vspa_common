@@ -81,12 +81,16 @@ int main(void)
     // 512-pt DIF FFT, half_fixed in -> half_fixed out (bit-reversed).
     // cbuffSize is in HALFWORD units (sizeof(cfixed16_t) = 2 halfwords on
     // VSPA2), matching cwproj's `INPUTBUFF_SIZE * 2`.
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     fftDIF512_hfx_hfx(
         (vspa_complex_fixed16 const *)(INP_BUFF + INPUT_OFFSET), /* pIn   */
         (vspa_complex_fixed16 *)OUT_BUFF,                        /* pOut  */
         (vspa_complex_fixed16 const *)INP_BUFF,                  /* pBuff */
         INPUTBUFF_SIZE * 2                                       /* halfwords */
     );
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp(OUT_BUFF, REF_DATA, N);
 }

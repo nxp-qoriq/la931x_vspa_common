@@ -66,7 +66,11 @@ int main(void)
         win[i]   = WIN_DATA[i];
     }
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     txWindowing_w16_vecaligned((void *)input, (void *)hist, (void *)win, CPLEN);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)input,
                           (const unsigned *)REF_DATA,

@@ -50,7 +50,11 @@ int main(void)
         INP_BUFF[i].im = (int16_t)((w >> 16) & 0xFFFFu);
     }
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     cycShiftFD_asm(INP_BUFF, OUT_BUFF, SHIFT, N);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)OUT_BUFF,
                           (const unsigned *)REF_DATA,

@@ -56,7 +56,7 @@ test_cases:
 
 perf:
   target_efficiency: null
-  cycles: 7304
+  cycles: 343
   au_config: vspa2_16au
   notes: "PASS with zero-tap smoke harness (N=128). Full functional coverage with nontrivial tap vectors needed.; re-measured runsim 2026-05-27 (median of 3)"
 ---

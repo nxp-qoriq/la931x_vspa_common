@@ -66,11 +66,15 @@ int main(void)
     for (i = 0; i < 2 * INP_LEN; i++)
         DECIM_INP_BUFF[i] = INPUT_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     decimator_2x_32hf(
         (void *)DECIM_INP_BUFF,             // inp_p = &BUFF[0]
         (void *)DECIM_OUT_BUFF,             // out_p
         (void *)DECIM_INP_BUFF,             // inp_circ_p = base
         (unsigned)INP_CIRC_SIZE_HW);        // 128 halfwords
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)DECIM_OUT_BUFF,
                           (const unsigned *)REF_DATA,

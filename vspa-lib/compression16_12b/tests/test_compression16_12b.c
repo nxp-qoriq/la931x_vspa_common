@@ -3,6 +3,39 @@
 
 #include <stdint.h>
 #include <stdio.h>
+
+// ---------------------------------------------------------------------------
+// Kernel cycle measurement (KCYC_*) - self-contained copy for harnesses that
+// do not include common/include/test_utils.h. Measures the kernel body only
+// (honest cycle count), not the whole-program runsim total.
+// ---------------------------------------------------------------------------
+#include <time.h>
+static clock_t _kcyc_start, _kcyc_end, _kcyc_overhead;
+__attribute__((unused, optimize("O0")))
+static void _kcyc_pipe_flush(void)
+{
+    __asm("fnop;");
+    __asm("fnop;");
+    __asm("fnop;");
+}
+#define KCYC_INIT()                                               \
+    do {                                                          \
+        _kcyc_start    = clock();                                 \
+        _kcyc_end      = clock();                                 \
+        _kcyc_overhead = _kcyc_end - _kcyc_start;                 \
+    } while (0)
+#define KCYC_START()                                              \
+    do {                                                          \
+        _kcyc_pipe_flush();                                       \
+        _kcyc_start = clock();                                    \
+    } while (0)
+#define KCYC_STOP_PRINT()                                         \
+    do {                                                          \
+        _kcyc_end = clock();                                      \
+        _kcyc_pipe_flush();                                       \
+        printf("KERNEL_CYCLES: %ld\n",                           \
+               (long)(_kcyc_end - _kcyc_start - _kcyc_overhead)); \
+    } while (0)
 #include <vspa/intrinsics.h>
 
 #define NB 2
@@ -34,7 +67,11 @@ int main(void)
         OUT[i] = 0;
     }
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     comp16_12b((unsigned short *)OUT, (unsigned short *)INP, NB);
+    KCYC_STOP_PRINT();
 
     for (i = 0; i < OUT_WORDS; i++) {
         uint32_t got = (uint32_t)OUT[i];

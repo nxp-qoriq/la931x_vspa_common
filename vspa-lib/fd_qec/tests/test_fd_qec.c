@@ -68,12 +68,16 @@ int main(void)
     for (i = 0; i < 2 * INP_TOTAL_CPLX; i++)
         FD_QEC_INP_BUFF[i] = INPUT_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     fd_qec(
         (void *)FD_QEC_OUT_BUFF,
         (void *)&FD_QEC_INP_BUFF[0],                // x
         (void *)&FD_QEC_INP_BUFF[2 * BUF_LEN],      // x_mirror   (1*BUF_LEN cplx = 2*BUF_LEN halfwords)
         (void *)&FD_QEC_INP_BUFF[4 * BUF_LEN],      // weights_a  (asm computes b = a + size)
         (unsigned)BUF_LEN);
+    KCYC_STOP_PRINT();
 
 #ifdef HONESTY_CHECK_CORRUPT
     for (i = 0; i < 2 * OUT_LEN; i++) REF_DATA_MUT[i] = REF_DATA[i];

@@ -61,7 +61,11 @@ int main(void)
     // taps + zero gain/DC/IQ-imb-coeffs, the chain output is all zero.
     sigcond_cfg.inCircBuffBase = input_buffer;
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     customsigcond_ddc1x_N2560_4t(input_buffer, output_buffer, &sigcond_cfg);
+    KCYC_STOP_PRINT();
 
     // Expected: N_COMPLEX zero complex samples. Compare as 32-bit words
     // (one cfixed16 == one u32). vspa_array_cmp prints PASS/FAIL.

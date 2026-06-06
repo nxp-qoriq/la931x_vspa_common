@@ -90,10 +90,14 @@ int main(void)
     for (i = 0; i < 6; i++)
         TXIQ_CFG[i] = CFG_DATA[i];
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     txiqcomp((const void *)TXIQ_INP_BUFF,
              (void *)TXIQ_OUT_BUFF,
              (void *)TXIQ_CFG,
              (unsigned)N_LINEPAIRS);
+    KCYC_STOP_PRINT();
 
     // cwproj's main.c flushes the VSPA2 pipeline by reading back a config
     // word; do the equivalent here so the final stores are visible before

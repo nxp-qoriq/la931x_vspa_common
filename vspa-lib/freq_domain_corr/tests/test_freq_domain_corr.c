@@ -77,9 +77,13 @@ int main(void)
         FREQ_DOMAIN_CORR_INP_OUT[i] = INPUT_DATA[i];
     }
 
+    // Measure only the kernel body (honest cycle count, not whole-program).
+    KCYC_INIT();
+    KCYC_START();
     vec_mult_64chp((void *)FREQ_DOMAIN_CORR_SCRATCH,
                    (void *)FREQ_DOMAIN_CORR_INP_OUT,
                    (unsigned)NUM_STREAMS);
+    KCYC_STOP_PRINT();
 
     return vspa_array_cmp((const unsigned *)FREQ_DOMAIN_CORR_INP_OUT,
                           (const unsigned *)REF_DATA,
