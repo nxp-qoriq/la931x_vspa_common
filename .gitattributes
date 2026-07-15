@@ -11,15 +11,17 @@
 *.py        text eol=lf
 *.tcl       text eol=lf
 *.sh        text eol=lf
-*.xml       -text
-*.launch    -text
+*.xml       text eol=crlf
+*.launch    text eol=crlf
+*.prefs     text eol=crlf
+.project    text eol=crlf
+.cproject   text eol=crlf
 *.bin       binary
 *.xlsx      -crlf -diff -merge
 *.docx      -crlf -diff -merge
 *.pdf       -crlf -diff -merge
 *.jpg       -crlf -diff -merge
 *.png       -crlf -diff -merge
-.project    -text
-.cproject   -text
+
 .gitattributes  export-ignore
 .gitignore      export-ignore
