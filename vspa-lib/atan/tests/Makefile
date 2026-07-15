@@ -6,6 +6,8 @@ VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
 LM_LICENSE_FILE   ?= /environment/licenses/license.dat
 export LM_LICENSE_FILE
 
+include ../../tools/checks.mk
+
 AU       ?= 16
 TC       ?= TC001
 
@@ -60,7 +62,7 @@ generate:
 generate-all:
 	python3 gen_vectors.py --all
 
-$(TARGET): $(SRCS) $(TC_PARAMS)
+$(TARGET): check-vspa $(SRCS) $(TC_PARAMS)
 	@mkdir -p $(BUILD_DIR)
 	$(VSPA_CC) $(VCFLAGS) \
 	    -mem $(VSPA_TOOL)/etc/vspa2_$(AU)au/lcf/vspa2_$(AU)au_sp.lcf \
@@ -74,7 +76,7 @@ $(TARGET): $(SRCS) $(TC_PARAMS)
 $(TC_PARAMS):
 	$(MAKE) generate TC=$(TC)
 
-test: $(TARGET)
+test: check-vspa check-sim $(TARGET)
 	python3 ../../tools/run_sim.py $(TARGET) vspa2_$(AU)au $(CYCLES)
 
 clean:

@@ -23,6 +23,19 @@ fi
 export VSPA_TOOL
 echo "VSPA_TOOL: $VSPA_TOOL"
 
+# Resolve VSPA simulator: env var > /opt default. Fail fast here so the
+# per-kernel loop below does not repeat the same guidance for every kernel.
+SIMULATOR_PATH="${SIMULATOR_PATH:-/opt/ccssim2/bin/runsim}"
+if [[ ! -x "$SIMULATOR_PATH" ]]; then
+    echo "ERROR: SIMULATOR_PATH is not set and /opt/ccssim2/bin/runsim not found:"; 
+    echo "  Set SIMULATOR_PATH to your  simulator executable, e.g.:";
+    echo "  SIMULATOR_PATH=/path/to/ccssim2/bin/runsim"; 
+    exit 2
+fi
+export SIMULATOR_PATH
+echo "SIMULATOR_PATH: $SIMULATOR_PATH"
+
+
 AU="${1:-16}"
 DATE_TAG="$(date +%Y%m%d_%H%M%S)"
 REPORT_DIR="${REPORT_DIR:-$TOOLS_DIR/../build/reports}"

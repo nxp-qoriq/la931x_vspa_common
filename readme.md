@@ -30,7 +30,7 @@ Download location `wget https://www.nxp.com/lgfiles/sdk/la1224/imx-la9310-sdk-10
 
 - Standalone VSPA Simulator
 Default install `/opt/ccssim2/bin/runsim` unless defined with SIMULATOR_PATH env variable
-Download location `wget https://www.nxp.com/lgfiles/sdk/la1224/imx-la9310-sdk-10/ccssim2_linux_gcc4-64_lin_1_0_63_3.tar.gz`
+Download location `wget https://www.nxp.com/lgfiles/sdk/la1224/imx-la9310-sdk-10/ccssim2_linux_gcc4-64_lin_1_0_63_4.tar.gz`
 
 ## Compile and run regression
 

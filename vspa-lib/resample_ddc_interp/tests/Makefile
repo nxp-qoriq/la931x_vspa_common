@@ -5,6 +5,8 @@ VSPA_TOOL         ?= /opt/VSPA_Tools_vbeta_14_00_781
 VSPA_CC            = $(VSPA_TOOL)/bin/fsvspacc
 LM_LICENSE_FILE   ?= /environment/licenses/license.dat
 export LM_LICENSE_FILE
+
+include ../../tools/checks.mk
 AU        ?= 16
 
 KERNEL_DIR    = ..
@@ -58,7 +60,7 @@ $(COMPUTE_TARGET): $(COMPUTE_SRCS)
 	    -o $@
 	@echo "Built: $@"
 
-$(TARGET): $(SRCS) vectors/input.hex
+$(TARGET): check-vspa $(SRCS) vectors/input.hex
 	@mkdir -p $(BUILD_DIR)
 	$(VSPA_CC) $(VCFLAGS) \
 	    -mem $(VSPA_TOOL)/etc/vspa2_$(AU)au/lcf/vspa2_$(AU)au_sp.lcf \
@@ -72,7 +74,7 @@ $(TARGET): $(SRCS) vectors/input.hex
 vectors/input.hex:
 	$(MAKE) generate
 
-test: $(TARGET)
+test: check-vspa check-sim $(TARGET)
 	python3 ../../tools/run_sim.py $(TARGET) vspa2_$(AU)au $(CYCLES)
 
 clean:
