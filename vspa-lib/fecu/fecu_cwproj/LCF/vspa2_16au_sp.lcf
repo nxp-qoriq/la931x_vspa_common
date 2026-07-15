@@ -1,0 +1,114 @@
+// *** Copyright Freescale Semiconductor, Inc, 2015-2016 ***
+//************************************************************************
+//*
+//* This memory control file defines the memory layout used with
+//* the VSPA simulator. 
+//*
+//* Custom LCF
+//*
+//* VCPU PRAM size: max allowed by 25bit address (0x8000000)
+//* IPPU PRAM size: 0x01000
+//* DRAM (VCPU + IPPU) size: max allowed by 18bit half-word address (0x80000)
+//* 	of which IPPU DRAM size: 0x02200
+//*
+//************************************************************************
+
+//
+// Define configuration specific values
+//
+
+arch(vspa2);
+number_of_cores(1);
+
+
+entry("_start");
+// DMEM_Line_Size is expressed in bytes and is dependent of AU number
+// The formula is 2 * number_of_AU * 4 bytes
+DMEM_Line_Size        = 4 * 2 * n_au();
+VCPU_DataReserveSize  = DMEM_Line_Size;
+DATA_TopMemAddress    = ((1024 * 256)  * 2);  // last address of VCPU data space: 2^18 transformed from half-words into bytes
+VCPU_CODE_TopMemAddress    = ((1024 * 1024 * 32)  * 4); // last address of VCPU code space: 2^25 transformed from words into bytes
+VCPU_TopMemAddress    = DATA_TopMemAddress - IPPU_DRAMSize;
+
+HeapSize   = 0x10000;
+StackSize  = 0x05000;
+IPPU_DRAM_start = ((VCPU_TopMemAddress + IPPU_DRAMSize) > DATA_TopMemAddress)
+	? (DATA_TopMemAddress - IPPU_DRAMSize)
+	: VCPU_TopMemAddress;
+StackStart = IPPU_DRAM_start - align((StackSize + HeapSize), DMEM_Line_Size);
+
+VCPU_PRAMSize = VCPU_CODE_TopMemAddress;
+VCPU_DRAMSize = StackStart - VCPU_DataReserveSize;
+IPPU_DRAMSize = 0x02200;
+IPPU_PRAMSize = 0x01000;
+
+memory_space (*)
+{
+	0("rx"): vcpu_pram, org = 0x0, len = VCPU_CODE_TopMemAddress ;
+	1("rw"): dram, org = 0x0, len = DATA_TopMemAddress; // contains both VCPU DRAM and IPPU DRAM
+	2("rx"): ippu_pram, org = 0x0, len = IPPU_PRAMSize;
+}
+
+unit private (*){
+	MEMORY {
+		vcpu_pram ("rx") 0 : org = 0x0, len = VCPU_PRAMSize;
+		vcpu_dram_r RESERVE   ("rw") 1 : org = 0x0, len = VCPU_DataReserveSize; //reserve at address 0 one DMEM line
+		vcpu_dram ("rw") 1 : org = VCPU_DataReserveSize, len = VCPU_DRAMSize;
+		ippu_pram ("rx") 2 : org = 0x0, len = IPPU_PRAMSize;
+		ippu_dram ("rw") 1 : org = IPPU_DRAM_start, len = IPPU_DRAMSize;
+		
+		memory_stack_and_heap ("rw") 1 : org = StackStart , len = StackSize + HeapSize;
+
+		
+	}
+	
+	SECTIONS {
+		.text {
+		    .init
+			"*startup*.eln"(".text");
+			.text
+			.default
+			.unlikely
+			unmatch_pgm("*");
+		} > vcpu_pram;
+		
+		.data {
+		    __data_start = .;
+			.rom
+			.rodata
+			unmatch_rom("*");
+			".data"
+			unmatch_data("*");
+			__data_end = .;
+			"*startup*.eln"(".data");
+			.bsstab
+			__bss_start = .;
+			".bss"
+			unmatch_bss("*");
+			.vbss
+			__end = .;
+			__bss_end = .;
+		} >vcpu_dram;
+		
+		.idata
+		{
+			.ibss
+		} > ippu_dram
+		
+		.itext
+		{
+			.itext
+		} > ippu_pram
+		
+		.stack {
+			LNK_SECTION(stack, "rw", StackSize + HeapSize, DMEM_Line_Size, "stack_and_heap");
+		}> memory_stack_and_heap;
+
+	}
+}
+
+_end = __end;
+__heap = endof("stack_and_heap") & 0xFFFFFF;
+_heap = __heap;
+__stack = originof("stack_and_heap") & 0xFFFFFF;
+_stack = originof("stack_and_heap") & 0xFFFFFF;
