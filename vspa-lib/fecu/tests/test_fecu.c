@@ -408,10 +408,15 @@ static int run_tc(uint32_t tc_id)
     //     (ENC_OUT_BUF tail reads back as zero), so those bits are gone and a
     //     lossless round-trip is impossible; the bit-exact encoder match above
     //     is the definitive check.
-    //   - BCC paths (TC0, TC1, TC3): the Viterbi-decoded BCC round-trip is
-    //     not bit-exact in this configuration, so the model-verified encoder
-    //     output above (per IEEE 802.11 Sec 18.3.5.6) is the correctness
-    //     criterion.
+    //   - BCC paths (TC0, TC1, TC3): the hardware Viterbi decoder does
+    //     recover the encoder input exactly when the trellis is terminated
+    //     (payload in encoder-input bits 0..11, bits 12..23 = 0: the encoder
+    //     overwrites 12..17 with the flush state and 18..23 must be 0 to end
+    //     in state 0).  The round-trip check is not wired up here yet (the
+    //     TC payloads do not follow that shape), so the model-verified
+    //     encoder output above (per IEEE 802.11 Sec 18.3.5.6) remains the
+    //     correctness criterion.  TODO: re-enable a TC0/TC3 BCC decode
+    //     round-trip with terminated payloads.
 
     // Skip the decode round-trip for every case except recoverable LDPC.
     if (!(cfg->use_ldpc && cfg->bypass_interleaver)) {
@@ -424,13 +429,13 @@ static int run_tc(uint32_t tc_id)
     // di_bypass (BYPASS bit[6]) is never set, so the DMEM interface always uses
     // 8-bit LLRs (scale=8, step=8) regardless of bypass_interleaver.
     //
-    // LLR sign convention differs by decoder type:
-    //   LDPC decoder: negates input LLR internally before belief propagation.
-    //                 positive input LLR = bit 1.
-    //                 bit 0 -> 0xE1 (-31),  bit 1 -> 0x1F (+31).
-    //   Viterbi decoder: sign(val) = (val < 0); negative LLR = bit 1.
-    //                 bit 0 -> 0x1F (+31),  bit 1 -> 0xE1 (-31).
-    // Unified LDPC LLR convention for all decoders (matches golden).
+    // LLR sign convention is the SAME for both decoder types (verified on the
+    // ISS with a clean codeword: the opposite polarity decodes to garbage):
+    //   LDPC decoder:    positive input LLR = bit 1.
+    //                    bit 0 -> 0xE1 (-31),  bit 1 -> 0x1F (+31).
+    //   Viterbi decoder: positive input LLR = bit 1 (same polarity as LDPC).
+    //                    bit 0 -> 0xE1 (-31),  bit 1 -> 0x1F (+31).
+    // Unified LLR convention for all decoders (matches golden).
     bits_to_llr(ENC_OUT_BUF, LLR_BUF, cfg->coded_bits, 8U, 0xE1U, 0x1FU);
 
     // Decode from LLR_BUF (fecu_p2p_decode calls wait_done internally)

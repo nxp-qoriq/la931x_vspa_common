@@ -304,7 +304,22 @@ def bcc_decode_hard(bits, rate=0, num_data_bits=None):
     for i in range(0, len(depunc) - 1, 2):
         symbols.append((depunc[i], depunc[i + 1]))
 
+    # Rounding the puncture-period count up can append symbols past the end
+    # of the received stream (e.g. rate 5/6 with 24 input bits: 29 coded bits
+    # = 4.8 periods -> 5 periods = 25 symbols for 24 trellis steps).  Those
+    # trailing symbols consumed no received bits and are pure erasures; drop
+    # them so the trellis length matches the encoder input length.
+    while symbols and symbols[-1] == (2, 2):
+        symbols.pop()
+
     # Viterbi ACS
+    #
+    # Trellis transitions mirror bcc_encode exactly: from previous state
+    # `prev` (6-bit shift register) with input bit `inp`, the 7-bit encoder
+    # register is sr7 = (inp << 6) | prev, the branch outputs are
+    # parity(sr7 & G0/G1), and the next state is sr7 >> 1
+    # (= (inp << 5) | (prev >> 1)).  The input bit is therefore the MSB
+    # (bit 5) of the next state, which is what the traceback extracts.
     INF = 10**9
     pm = [INF] * num_states
     pm[0] = 0
@@ -313,24 +328,24 @@ def bcc_decode_hard(bits, rate=0, num_data_bits=None):
     for c0_rx, c1_rx in symbols:
         new_pm = [INF] * num_states
         tb_row = [0] * num_states
-        for s in range(num_states):
+        for prev in range(num_states):
+            if pm[prev] == INF:
+                continue
             for inp in (0, 1):
-                prev_sr = (s >> 1) | (inp << (_K - 2))
-                if prev_sr >= num_states:
-                    continue
-                sr_enc = (s | (inp << (_K - 1))) & 0x7F
-                c0 = _parity(sr_enc & _G0)
-                c1 = _parity(sr_enc & _G1)
+                sr7 = (inp << (_K - 1)) | prev
+                c0 = _parity(sr7 & _G0)
+                c1 = _parity(sr7 & _G1)
+                nxt = sr7 >> 1
                 # Branch metric: Hamming distance, skip erasures
                 bm = 0
                 if c0_rx != 2:
                     bm += (c0 != c0_rx)
                 if c1_rx != 2:
                     bm += (c1 != c1_rx)
-                cand = pm[prev_sr] + bm
-                if cand < new_pm[s]:
-                    new_pm[s] = cand
-                    tb_row[s] = prev_sr
+                cand = pm[prev] + bm
+                if cand < new_pm[nxt]:
+                    new_pm[nxt] = cand
+                    tb_row[nxt] = prev
         pm = new_pm
         traceback.append(tb_row)
 
